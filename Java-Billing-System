@@ -1,0 +1,51 @@
+package com.billing;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.*;
+import java.sql.*;
+
+@WebServlet("/bill")
+public class BillingServlet extends HttpServlet {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String product = request.getParameter("product");
+        int price = Integer.parseInt(request.getParameter("price"));
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+
+        int total = price * quantity;
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            Connection con = DriverManager.getConnection(
+                    "jdbc:mysql://localhost:3306/billingdb",
+                    "root",
+                    "password");
+
+            String query = "insert into bill(product,price,quantity,total) values(?,?,?,?)";
+            PreparedStatement ps = con.prepareStatement(query);
+
+            ps.setString(1, product);
+            ps.setInt(2, price);
+            ps.setInt(3, quantity);
+            ps.setInt(4, total);
+
+            ps.executeUpdate();
+
+            PrintWriter out = response.getWriter();
+            out.println("<h2>Invoice Generated</h2>");
+            out.println("Product: " + product + "<br>");
+            out.println("Total Amount: " + total);
+
+            con.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
