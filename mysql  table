@@ -1,7 +1,0 @@
-CREATE TABLE bill(
-id INT PRIMARY KEY AUTO_INCREMENT,
-product VARCHAR(50),
-price INT,
-quantity INT,
-total INT
-);
